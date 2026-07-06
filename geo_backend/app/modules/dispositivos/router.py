@@ -6,6 +6,7 @@ from app.db.session import get_db
 from app.modules.dispositivos.schemas import (
     DispositivoCreate,
     DispositivoOut,
+    DispositivoRegistradoOut,
     DispositivoRevocarRequest,
 )
 from app.modules.dispositivos.service import DispositivosService
@@ -19,11 +20,16 @@ def listar_dispositivos(db: Session = Depends(get_db)):
     return DispositivosService(db).listar()
 
 
-@router.post("", response_model=DispositivoOut, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=DispositivoRegistradoOut,  # incluye hmac_key
+    status_code=status.HTTP_201_CREATED,
+)
 def registrar_dispositivo(datos: DispositivoCreate, db: Session = Depends(get_db)):
     """
-    Registra un nuevo dispositivo autorizado para sincronizar (HU-02).
-    El primer acceso de un dispositivo requiere esta aprobación manual.
+    Registra un nuevo dispositivo autorizado (HU-02).
+    IMPORTANTE: La respuesta incluye hmac_key — guardala de forma segura.
+    El servidor no vuelve a mostrarla. Si se pierde, revocar y re-registrar.
     """
     return DispositivosService(db).registrar(datos)
 

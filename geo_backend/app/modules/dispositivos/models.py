@@ -1,4 +1,5 @@
 # app/modules/dispositivos/models.py
+import secrets
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, String, Text
@@ -42,6 +43,15 @@ class Dispositivo(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     ultimo_sync: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+
+    # Clave HMAC única por dispositivo para firmar payloads de sync (RN-07)
+    # Generada aleatoriamente al registrar — nunca se vuelve a mostrar
+    hmac_key: Mapped[str] = mapped_column(
+        String(64),
+        nullable=False,
+        default=lambda: secrets.token_hex(32),
+    )
+
 
     def __repr__(self) -> str:
         estado = "activo" if self.activo else "revocado"

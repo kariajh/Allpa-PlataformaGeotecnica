@@ -75,9 +75,21 @@ class SyncService:
     ) -> None:
         """
         Verifica la firma HMAC-SHA256 del payload (RN-07).
-        La clave de firma es el SECRET_KEY del servidor combinado con device_id.
+        Usa la clave única del dispositivo (provisionada al registrarlo),
+        no el SECRET_KEY del servidor — más seguro porque cada dispositivo
+        tiene su propia clave independiente.
         """
-        clave = f"{settings.SECRET_KEY}:{device_id}".encode("utf-8")
+        dispositivo = self.db.execute(
+            select(Dispositivo).where(Dispositivo.device_id == device_id)
+        ).scalars().first()
+
+        if dispositivo is None or not dispositivo.hmac_key:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Dispositivo no registrado o sin clave HMAC provisionada.",
+            )
+
+        clave = dispositivo.hmac_key.encode("utf-8")
         payload_str = json.dumps(
             [r.model_dump(mode="json") for r in registros],
             default=str,

@@ -1,4 +1,5 @@
 # app/modules/dispositivos/service.py
+import secrets
 from datetime import datetime, timezone
 
 from fastapi import HTTPException, status
@@ -35,8 +36,8 @@ class DispositivosService:
 
     def registrar(self, datos: DispositivoCreate) -> Dispositivo:
         """
-        Registra un nuevo dispositivo autorizado (HU-02).
-        Si el device_id ya existe, devuelve 409 Conflict.
+        Registra un nuevo dispositivo y genera su clave HMAC única (HU-02).
+        La clave se devuelve UNA SOLA VEZ en la respuesta del registro.
         """
         existente = self.obtener_por_device_id(datos.device_id)
         if existente:
@@ -45,7 +46,13 @@ class DispositivosService:
                 detail=f"El device_id '{datos.device_id}' ya está registrado.",
             )
 
-        dispositivo = Dispositivo(**datos.model_dump())
+        # Generar clave HMAC aleatoria y segura (256 bits)
+        hmac_key = secrets.token_hex(32)
+
+        dispositivo = Dispositivo(
+            **datos.model_dump(),
+            hmac_key=hmac_key,
+        )
         self.db.add(dispositivo)
         self.db.flush()
 
@@ -56,7 +63,10 @@ class DispositivosService:
             tipo_accion=TipoAccionAuditoria.CREACION,
             usuario="admin",
             device_id=datos.device_id,
-            descripcion=f"Dispositivo '{datos.nombre}' registrado para {datos.responsable}",
+            descripcion=(
+                f"Dispositivo '{datos.nombre}' registrado para {datos.responsable}. "
+                f"Clave HMAC provisionada."
+            ),
         )
 
         self.db.commit()
