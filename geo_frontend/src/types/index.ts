@@ -308,6 +308,12 @@ export interface DispositivoRevocarRequest {
   motivo: string
 }
 
+// Solo se devuelve en el POST /dispositivos. El servidor nunca vuelve a
+// mostrar hmac_key — si se pierde, hay que revocar y re-registrar.
+export interface DispositivoRegistrado extends Dispositivo {
+  hmac_key: string
+}
+
 // ---------------------------------------------------------------------
 // Sincronización
 // ---------------------------------------------------------------------
@@ -348,6 +354,15 @@ export interface SyncResponse {
   conflictos: number
   resultados: ResultadoRegistro[]
 }
+ 
+export interface GeopackImportResponse {
+  device_id: string
+  registros_importados: number
+  synced: number
+  omitidos: number
+  conflictos: number
+}
+ 
  
 export interface GeopackImportResponse {
   device_id: string

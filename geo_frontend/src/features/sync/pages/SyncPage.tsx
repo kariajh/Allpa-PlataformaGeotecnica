@@ -1,20 +1,44 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Upload, AlertTriangle } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Upload, AlertTriangle, RefreshCw } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
-import { useImportarGeopack, usePendientesSync } from '@/hooks/useSync'
+import { useImportarGeopack, usePendientesSync, useSincronizarDelta } from '@/hooks/useSync'
 import { getDeviceId } from '@/lib/device'
+import { getHmacKey } from '@/lib/hmac-store'
 import type { GeopackImportResponse } from '@/types'
 
 export default function SyncPage() {
+  const deviceId = getDeviceId()
+  const tieneClave = Boolean(getHmacKey(deviceId))
+
   const { data: pendientes } = usePendientesSync()
+  const syncMutation = useSincronizarDelta()
+
   const importarMutation = useImportarGeopack()
   const [archivo, setArchivo] = useState<File | null>(null)
   const [resultado, setResultado] = useState<GeopackImportResponse | null>(null)
+
+  async function handleSincronizar() {
+    try {
+      // TODO: hoy el outbox va a estar vacío casi siempre porque los
+      // hooks de creación de cada módulo todavía no encolan ahí cuando
+      // falla la red — queda como trabajo futuro. Esto ya sincroniza lo
+      // que efectivamente haya en la cola.
+      const res = await syncMutation.mutateAsync([])
+      toast.success(`${res.synced} registro(s) sincronizado(s)`)
+    } catch (err) {
+      if (err instanceof Error && err.message === 'SIN_HMAC_KEY') {
+        toast.error('Este dispositivo no tiene clave HMAC guardada. Registralo primero.')
+      } else {
+        toast.error('El backend rechazó la sincronización. Revisá la firma o la conexión.')
+      }
+    }
+  }
 
   async function handleImportar() {
     if (!archivo) return
@@ -31,31 +55,35 @@ export default function SyncPage() {
     <div className="space-y-8">
       <h1 className="text-xl font-semibold">Sincronización</h1>
 
-      {/* Sincronización delta: pendiente de definir el esquema de firma HMAC */}
       <section>
         <h2 className="text-lg font-medium mb-3">Sincronización delta (WiFi / Starlink)</h2>
         <Card><CardContent className="p-6 space-y-3">
-          <div className="flex items-start gap-2 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-md px-4 py-3">
-            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-            <div>
-              Pendiente de definir cómo el dispositivo obtiene la clave para firmar el
-              payload (HMAC-SHA256, RN-07). El backend va a rechazar esta sincronización
-              hasta resolverlo — avisame cuando esté definido y la conecto.
+          {!tieneClave && (
+            <div className="flex items-start gap-2 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-md px-4 py-3">
+              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+              <div>
+                Este dispositivo no tiene una clave HMAC guardada en este navegador.
+                Registralo en{' '}
+                <Link to="/dispositivos" className="underline font-medium">Dispositivos</Link>
+                {' '}usando "Usar este dispositivo" para poder sincronizar.
+              </div>
             </div>
-          </div>
+          )}
           <p className="text-sm text-muted-foreground">
             {pendientes?.length ?? 0} cambio(s) pendiente(s) de sincronizar en este dispositivo.
           </p>
-          <Button disabled>Sincronizar ahora</Button>
+          <Button onClick={handleSincronizar} disabled={!tieneClave || syncMutation.isPending}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            {syncMutation.isPending ? 'Sincronizando...' : 'Sincronizar ahora'}
+          </Button>
         </CardContent></Card>
       </section>
 
-      {/* Importación de .geopack: funcional */}
       <section>
         <h2 className="text-lg font-medium mb-3">Importar paquete .geopack (USB / SD)</h2>
         <Card><CardContent className="p-6 space-y-4">
           <p className="text-sm text-muted-foreground">
-            Dispositivo actual: <span className="font-mono">{getDeviceId()}</span>
+            Dispositivo actual: <span className="font-mono">{deviceId}</span>
           </p>
           <input
             type="file"

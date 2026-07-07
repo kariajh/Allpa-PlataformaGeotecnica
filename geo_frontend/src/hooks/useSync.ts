@@ -1,14 +1,14 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { syncApi } from '@/api/sync'
 import { getDeviceId } from '@/lib/device'
+import { getHmacKey } from '@/lib/hmac-store'
+import { firmarRegistros } from '@/lib/sync-signature'
 import { db } from '@/db/schema'
 import type { RegistroDelta } from '@/types'
 
-// Lee la cola local de pendientes (Dexie). OJO: hoy ningún hook de
-// creación (useProyectos, useSondeos, etc.) todavía escribe en esta tabla
-// cuando falla por error de red — quedó como TODO en cada uno desde el
-// scaffold inicial. Hasta que se conecte esa parte, esto va a mostrar
-// siempre 0 pendientes aunque haya cambios sin sincronizar.
+// Ver caveat en el propio hook: hoy esto va a estar vacío casi siempre,
+// porque ningún hook de creación (useProyectos, useSondeos, etc.) escribe
+// todavía en esta tabla cuando falla por error de red.
 export function usePendientesSync() {
   return useQuery({
     queryKey: ['sync', 'pendientes'],
@@ -23,11 +23,17 @@ export function useImportarGeopack() {
   })
 }
 
-// Estructura lista para cuando se defina el esquema de firma HMAC.
-// Hoy envía firma: '' — el backend debería rechazarlo (RN-07).
+// Lanza 'SIN_HMAC_KEY' si este dispositivo nunca se registró (o se
+// registró en otro navegador/perfil, donde localStorage no tiene la
+// clave). La página debe capturar ese caso puntual.
 export function useSincronizarDelta() {
   return useMutation({
-    mutationFn: (registros: RegistroDelta[]) =>
-      syncApi.sincronizarDelta({ device_id: getDeviceId(), firma: '', registros }),
+    mutationFn: async (registros: RegistroDelta[]) => {
+      const deviceId = getDeviceId()
+      const hmacKey = getHmacKey(deviceId)
+      if (!hmacKey) throw new Error('SIN_HMAC_KEY')
+      const firma = await firmarRegistros(hmacKey, registros)
+      return syncApi.sincronizarDelta({ device_id: deviceId, firma, registros })
+    },
   })
 }

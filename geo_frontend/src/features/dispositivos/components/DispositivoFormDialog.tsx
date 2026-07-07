@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { Copy, ShieldAlert } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -14,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { dispositivoSchema, type DispositivoFormValues } from '../schema'
 import { useCreateDispositivo } from '@/hooks/useDispositivos'
 import { getDeviceId } from '@/lib/device'
+import { storeHmacKey } from '@/lib/hmac-store'
 
 interface Props {
   open: boolean
@@ -29,16 +31,62 @@ export function DispositivoFormDialog({ open, onOpenChange }: Props) {
     defaultValues: emptyValues,
   })
 
-  useEffect(() => { if (open) form.reset(emptyValues) }, [open, form])
+  // Tras crear, guardamos la clave localmente y la mostramos una vez acá
+  // mismo (el servidor nunca la vuelve a exponer).
+  const [hmacKeyMostrada, setHmacKeyMostrada] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (open) {
+      form.reset(emptyValues)
+      setHmacKeyMostrada(null)
+    }
+  }, [open, form])
 
   async function onSubmit(values: DispositivoFormValues) {
     try {
-      await createMutation.mutateAsync(values)
+      const creado = await createMutation.mutateAsync(values)
+      storeHmacKey(creado.device_id, creado.hmac_key)
+      setHmacKeyMostrada(creado.hmac_key)
       toast.success('Dispositivo registrado')
-      onOpenChange(false)
     } catch {
       toast.error('No se pudo registrar el dispositivo.')
     }
+  }
+
+  function copiarClave() {
+    if (!hmacKeyMostrada) return
+    navigator.clipboard.writeText(hmacKeyMostrada)
+    toast.success('Clave copiada al portapapeles')
+  }
+
+  // Estado 2: mostrar la clave una sola vez, con aviso.
+  if (hmacKeyMostrada) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldAlert className="h-5 w-5 text-amber-600" />
+              Guardá esta clave ahora
+            </DialogTitle>
+            <DialogDescription>
+              El servidor no vuelve a mostrar esta clave. Ya quedó guardada en este
+              navegador para poder firmar sincronizaciones, pero si necesitás configurar
+              este dispositivo en otro lugar, copiala ahora.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center gap-2 bg-secondary rounded-md p-3">
+            <code className="text-xs break-all flex-1">{hmacKeyMostrada}</code>
+            <Button type="button" variant="ghost" size="icon" onClick={copiarClave}>
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => onOpenChange(false)}>Entendido, cerrar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    )
   }
 
   return (
