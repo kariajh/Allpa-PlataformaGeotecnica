@@ -1,0 +1,57 @@
+# ==== Python / FastAPI ====
+venv/
+.venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# ==== Node / React / Vite ====
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.local
+
+# ==== Variables de entorno y secretos ====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials/
+
+# ==== Claves de sincronización ====
+*.geopack
+device-keys/
+
+# ==== Media / uploads locales ====
+media/
+uploads/
+
+# ==== IDEs / editores ====
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ==== Sistema operativo ====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==== Logs ====
+*.log
+logs/
+
+# ==== Testing / coverage ====
+.coverage
+htmlcov/
+.pytest_cache/
+coverage/
+
+# ==== Backups de operaciones de git ====
+replacements.txt

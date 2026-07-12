@@ -10,9 +10,6 @@ from app.core.config import settings
 from app.db.base import Base
 
 # Importar TODOS los modelos acá para que Base.metadata los conozca.
-# Por ahora no hay ninguno creado todavía; a medida que escribamos
-# Proyecto, Sondeo, etc. en sus respectivos models.py, hay que
-# agregar el import correspondiente en este bloque.
 # Ejemplo (cuando exista):
 from app.modules.proyectos.models import Proyecto   #noqa: F401
 from app.modules.sondeos.models import Sondeo  # noqa: F401

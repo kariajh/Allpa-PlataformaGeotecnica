@@ -1,23 +1,25 @@
-# app/core/config.py
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    # --- General ---
+    # --- General (no sensible, default está bien) ---
     PROJECT_NAME: str = "GeoField API"
     ENVIRONMENT: str = "development"  # development | production
 
     # --- Base de datos (PostgreSQL + PostGIS) ---
-    DATABASE_URL: str = "postgresql://REDACTED:REDACTED@localhost:5432/geofield_db"
+    # SIN default: si falta en .env, pydantic tira ValidationError al arrancar
+    # en vez de conectarse silenciosamente a un valor hardcodeado en el repo.
+    DATABASE_URL: str
 
     # --- JWT / Autenticación ---
-    SECRET_KEY: str = "CAMBIAR_ESTO_EN_PRODUCCION"
+    # SIN default por el mismo motivo: nunca queremos firmar tokens con
+    # un secreto que está público en GitHub.
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 horas
 
-    # --- CORS ---
-    # Orígenes permitidos para el frontend (Vite corre por defecto en 5173)
+    # --- CORS (no sensible) ---
     CORS_ORIGINS: list[str] = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
