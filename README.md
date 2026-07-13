@@ -165,7 +165,7 @@ usar `VITE_API_URL` directamente, como está armado en `src/api/client.ts`.
 
 <img width="1361" height="517" alt="image" src="https://github.com/user-attachments/assets/7c48fb5b-fcdf-4c7e-bd6d-f14b1abe103e" />
 
-Editar
+**Editar**
 <img width="1305" height="596" alt="image" src="https://github.com/user-attachments/assets/6898b9d5-d2ae-478b-b4cd-607cc4871010" />
 
 ### Modulo Sondeos
@@ -173,7 +173,7 @@ Editar
 
 <img width="1362" height="564" alt="image" src="https://github.com/user-attachments/assets/89f28c13-67ec-4ab6-815a-455380e88248" />
 
-Nuevo Sondeo
+**Nuevo Sondeo**
 
 <img width="1357" height="592" alt="image" src="https://github.com/user-attachments/assets/7e708fe4-861f-445c-a8b5-a7abf41d4b50" />
 
@@ -181,7 +181,7 @@ Nuevo Sondeo
 
 <img width="1360" height="609" alt="image" src="https://github.com/user-attachments/assets/369d1135-0263-4064-b5be-7c50a3f53e0f" />
 
-Nuevo Ensayo SPT
+**Nuevo Ensayo SPT**
 
 <img width="1344" height="620" alt="image" src="https://github.com/user-attachments/assets/986ec963-2019-4977-86f7-32d3decc0335" />
 
