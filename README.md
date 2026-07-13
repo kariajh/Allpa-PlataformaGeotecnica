@@ -1,5 +1,5 @@
 # ALLPA
-## Plataforma Geotécnica Integral
+## Plataforma Geotécnica
 **Sistema de Gestión Geotécnica Offline-First**
 
 Aplicación web progresiva (PWA) para captura y gestión de datos
