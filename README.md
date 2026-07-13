@@ -161,14 +161,14 @@ usar `VITE_API_URL` directamente, como está armado en `src/api/client.ts`.
 
 ## Capturas de pantalla
 
-###Modulo Proyectos
+### Modulo Proyectos
 
 <img width="1361" height="517" alt="image" src="https://github.com/user-attachments/assets/7c48fb5b-fcdf-4c7e-bd6d-f14b1abe103e" />
 
 Editar
 <img width="1305" height="596" alt="image" src="https://github.com/user-attachments/assets/6898b9d5-d2ae-478b-b4cd-607cc4871010" />
 
-###Modulo Sondeos
+### Modulo Sondeos
 
 
 <img width="1362" height="564" alt="image" src="https://github.com/user-attachments/assets/89f28c13-67ec-4ab6-815a-455380e88248" />
@@ -177,7 +177,7 @@ Nuevo Sondeo
 
 <img width="1357" height="592" alt="image" src="https://github.com/user-attachments/assets/7e708fe4-861f-445c-a8b5-a7abf41d4b50" />
 
-###Modulo SPT - Ensayo de Penetración Estándar
+### Modulo SPT - Ensayo de Penetración Estándar
 
 <img width="1360" height="609" alt="image" src="https://github.com/user-attachments/assets/369d1135-0263-4064-b5be-7c50a3f53e0f" />
 
