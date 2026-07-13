@@ -159,6 +159,33 @@ npm run dev
 El proxy de Vite ya redirige `/api` → `http://localhost:8000`; también podés
 usar `VITE_API_URL` directamente, como está armado en `src/api/client.ts`.
 
+## Capturas de pantalla
+
+###Modulo Proyectos
+
+<img width="1361" height="517" alt="image" src="https://github.com/user-attachments/assets/7c48fb5b-fcdf-4c7e-bd6d-f14b1abe103e" />
+
+Editar
+<img width="1305" height="596" alt="image" src="https://github.com/user-attachments/assets/6898b9d5-d2ae-478b-b4cd-607cc4871010" />
+
+###Modulo Sondeos
+
+
+<img width="1362" height="564" alt="image" src="https://github.com/user-attachments/assets/89f28c13-67ec-4ab6-815a-455380e88248" />
+
+Nuevo Sondeo
+
+<img width="1357" height="592" alt="image" src="https://github.com/user-attachments/assets/7e708fe4-861f-445c-a8b5-a7abf41d4b50" />
+
+###Modulo SPT - Ensayo de Penetración Estándar
+
+<img width="1360" height="609" alt="image" src="https://github.com/user-attachments/assets/369d1135-0263-4064-b5be-7c50a3f53e0f" />
+
+Nuevo Ensayo SPT
+
+<img width="1344" height="620" alt="image" src="https://github.com/user-attachments/assets/986ec963-2019-4977-86f7-32d3decc0335" />
+
+
 ## Seguridad
 
 - Ningún secreto (`DATABASE_URL`, `SECRET_KEY`) tiene valor por default en
@@ -178,7 +205,5 @@ usar `VITE_API_URL` directamente, como está armado en `src/api/client.ts`.
    route guard.
 3. Implementar el worker de sync que drena la tabla `outbox` de Dexie
    contra el backend cuando vuelve la conexión.
-4. Construir las pantallas reales módulo por módulo, empezando por
-   Proyectos → Sondeos (base jerárquica de SPT, CPT y Estratigrafía).
-5. Decidir si se suma cifrado en reposo para IndexedDB (`dexie-encrypted`)
+4. Decidir si se suma cifrado en reposo para IndexedDB (`dexie-encrypted`)
    dado que no hay equivalente automático a SQLCipher en el navegador.
